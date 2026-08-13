@@ -30,11 +30,98 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* --- PREVENT SCROLLING WHEN LOCKED --- */
+        body.locked {
+            overflow: hidden !important;
+            height: 100vh !important;
+            width: 100vw !important;
+            position: fixed !important;
+            touch-action: none !important;
+        }
+
+        /* --- HIDE PAGE CONTENT UNTIL UNLOCKED --- */
+        .content-hidden {
+            display: none !important;
+        }
+
         body {
             background: var(--bg-gradient);
             color: #2b2b2b;
             overflow-x: hidden;
             perspective: 1000px;
+        }
+
+        /* --- COUNTDOWN OVERLAY STYLES --- */
+        .countdown-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: var(--bg-gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 30000;
+            text-align: center;
+            padding: 20px;
+            transition: opacity 0.6s ease;
+        }
+
+        .countdown-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid var(--primary);
+            padding: 40px 25px;
+            border-radius: 32px;
+            box-shadow: 0 20px 50px rgba(255, 42, 109, 0.3);
+            max-width: 520px;
+            width: 100%;
+        }
+
+        .timer-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 25px 0 10px 0;
+        }
+
+        .timer-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+            flex: 1;
+        }
+
+        .timer-num {
+            font-size: clamp(1.6rem, 5vw, 2.5rem);
+            font-weight: 800;
+            color: var(--primary);
+            background: #ffffff;
+            border: 1px solid rgba(255, 42, 109, 0.2);
+            padding: 10px 5px;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(255, 42, 109, 0.15);
+            width: 100%;
+            text-align: center;
+            font-family: monospace, 'Poppins', sans-serif;
+        }
+
+        .timer-label {
+            font-size: 0.8rem;
+            color: #555;
+            font-weight: 700;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .timer-colon {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 22px;
         }
 
         /* --- CURVY & ROMANTIC FONTS --- */
@@ -384,10 +471,7 @@
             margin-bottom: 35px;
         }
 
-        /* =========================================================
-           IMAGE BOX ANIMATIONS & STYLES (ENHANCED ENTRANCE & HOVER)
-           ========================================================= */
-
+        /* --- ANIMATION BOXES --- */
         .anim-box {
             opacity: 0;
             transform: translateY(40px) scale(0.95);
@@ -509,7 +593,6 @@
         .envelope-card-10:hover { transform: translateY(-8px) rotate(2deg) scale(1.03); box-shadow: 0 20px 35px rgba(255,42,109,0.35); }
         .envelope-card-10:hover img { transform: scale(1.08); }
 
-
         /* --- CONTINUOUS SCROLLING GALLERY --- */
         .carousel-wrapper {
             width: 100%; overflow: hidden; position: relative; padding: 25px 0;
@@ -532,14 +615,11 @@
             100% { transform: translateX(-50%); }
         }
 
-        /* ==========================================
-           3 DIFFERENT STYLED VIDEO SECTIONS
-           ========================================== */
+        /* --- VIDEO SECTIONS --- */
         .video-container-1 {
             max-width: 800px; width: 100%; margin: 0 auto; border-radius: 22px;
             overflow: hidden; box-shadow: 0 20px 45px rgba(255, 42, 109, 0.3);
-            border: 4px solid #fff; background: #000;
-            transition: transform 0.4s ease;
+            border: 4px solid #fff; background: #000; transition: transform 0.4s ease;
         }
         .video-container-1:hover { transform: scale(1.02); }
         .video-container-1 video { width: 100%; display: block; }
@@ -562,7 +642,6 @@
         .neon-video-3:hover { transform: scale(1.02); box-shadow: 0 0 50px rgba(255,0,85,0.9); }
         .neon-video-screen { border-radius: 18px; overflow: hidden; background: #000; }
         .neon-video-screen video { width: 100%; display: block; }
-
 
         /* --- ORBIT UNIVERSE --- */
         .orbit-container {
@@ -644,7 +723,7 @@
             50% { transform: scale(1.1); box-shadow: 0 12px 30px rgba(255, 42, 109, 0.8); }
         }
 
-        /* --- LOGIN & VIEW SELECTION SCREEN --- */
+        /* --- LOGIN SCREEN --- */
         .password-modal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #ffd6e0; display: flex; justify-content: center; align-items: center;
@@ -667,9 +746,41 @@
         #errorMsg { color: #ff0000; font-size: 0.9rem; margin-top: 15px; display: none; font-weight: 600; }
     </style>
 </head>
-<body>
+<body class="locked">
 
-    <!-- FIRST LOGIN PORTAL -->
+    <!-- COUNTDOWN OVERLAY -->
+    <div class="countdown-overlay" id="countdownOverlay">
+        <div class="countdown-card">
+            <div style="font-size: 2.8rem; margin-bottom: 5px;">⏳✨</div>
+            <h2 class="curvy-title" style="font-size: 2.6rem; color: var(--primary);">Bishesh Muhurter Apeksha...</h2>
+            
+            
+            <div class="timer-display">
+                <div class="timer-unit">
+                    <span class="timer-num" id="cdHours">00</span>
+                    <span class="timer-label">Hours</span>
+                </div>
+                <span class="timer-colon">:</span>
+                <div class="timer-unit">
+                    <span class="timer-num" id="cdMinutes">00</span>
+                    <span class="timer-label">Mins</span>
+                </div>
+                <span class="timer-colon">:</span>
+                <div class="timer-unit">
+                    <span class="timer-num" id="cdSeconds">00</span>
+                    <span class="timer-label">Secs</span>
+                </div>
+                <span class="timer-colon">:</span>
+                <div class="timer-unit">
+                    <span class="timer-num" id="cdMs">00</span>
+                    <span class="timer-label">MS</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- LOGIN PORTAL -->
     <div class="password-modal" id="passwordUnlockScreen">
         <div class="password-card">
             <div class="password-icon" style="margin-bottom: 15px;">
@@ -679,352 +790,439 @@
             </div>
             <h2 class="password-title curvy-title" style="font-size: 2.4rem; color: #ff0055;">Bishesh Gopon Muhurto! ❤️</h2>
             <p class="password-subtitle curvy-hand" style="font-size: 1.3rem; margin-bottom: 20px;">Prothome login korun ebong nicher view select korun:</p>
-            <input type="password" id="secretInput" class="password-input" placeholder="Enter password (ILoveYou)...">
+            <input type="password" id="secretInput" class="password-input" placeholder="Enter password (SofickMyLove)...">
             <button class="password-btn curvy-hand" style="font-size: 1.4rem;" onclick="checkPassword()">Login & Enter ✨</button>
             <p id="errorMsg">Bhul password! Abar chesta korun.</p>
         </div>
     </div>
 
-    <div id="particle-container"></div>
+    <!-- MAIN PAGE CONTENT CONTAINER (HIDDEN UNTIL COMPLETE UNLOCK) -->
+    <div id="pageContent" class="content-hidden">
+        <div id="particle-container"></div>
 
-    <!-- Header Navigation & View Option Switcher -->
-    <header>
-        <div class="view-switcher">
-            <button class="view-btn active" onclick="switchView(this, 'all')">🌟 All Views</button>
-            <button class="view-btn" onclick="switchView(this, 'photos')">📸 Photos Only</button>
-            <button class="view-btn" onclick="switchView(this, 'videos')">🎬 Videos Only</button>
-        </div>
-        <nav>
-            <a href="#home">HOME</a>
-            <a href="#studio">STUDIO</a>
-            <a href="#polaroid">POLAROID</a>
-            <a href="#mosaic">MOSAIC</a>
-            <a href="#bubbles">BUBBLES</a>
-            <a href="#neon">NEON</a>
-            <a href="#glass">GLASS</a>
-            <a href="#stack">STACK</a>
-            <a href="#ribbon">RIBBON</a>
-            <a href="#holo">HOLO</a>
-            <a href="#envelope">ENVELOPE</a>
-            <a href="#videos">VIDEOS</a>
-            <a href="#orbit">WORLD</a>
-            <a href="#contact">CONNECT</a>
-        </nav>
-    </header>
+        <!-- Header Navigation & View Option Switcher -->
+        <header>
+            <div class="view-switcher">
+                <button class="view-btn active" onclick="switchView(this, 'all')">🌟 All Views</button>
+                <button class="view-btn" onclick="switchView(this, 'photos')">📸 Photos Only</button>
+                <button class="view-btn" onclick="switchView(this, 'videos')">🎬 Videos Only</button>
+            </div>
+            <nav>
+                <a href="#home">HOME</a>
+                <a href="#studio">STUDIO</a>
+                <a href="#polaroid">POLAROID</a>
+                <a href="#mosaic">MOSAIC</a>
+                <a href="#bubbles">BUBBLES</a>
+                <a href="#neon">NEON</a>
+                <a href="#glass">GLASS</a>
+                <a href="#stack">STACK</a>
+                <a href="#ribbon">RIBBON</a>
+                <a href="#holo">HOLO</a>
+                <a href="#envelope">ENVELOPE</a>
+                <a href="#videos">VIDEOS</a>
+                <a href="#orbit">WORLD</a>
+                <a href="#contact">CONNECT</a>
+            </nav>
+        </header>
 
-    <button class="music-float" onclick="toggleMusic()" id="musicBtn" aria-label="Music Toggle">🎵</button>
-    <audio id="bgMusic" loop preload="auto">
-        <source src="song1.mp3" type="audio/mpeg">
-    </audio>
+        <button class="music-float" onclick="toggleMusic()" id="musicBtn" aria-label="Music Toggle">🎵</button>
+        <audio id="bgMusic" loop preload="auto">
+            <source src="song1.mp3" type="audio/mpeg">
+        </audio>
 
-    <!-- HERO SECTION WITH SVG GLOWING HEART -->
-    <section class="hero" id="home">
-        <div class="hero-orb orb-1"></div>
-        <div class="hero-orb orb-2"></div>
+        <!-- HERO SECTION -->
+        <section class="hero" id="home">
+            <div class="hero-orb orb-1"></div>
+            <div class="hero-orb orb-2"></div>
 
-        <div class="hero-content">
-            <div class="tagline curvy-sub" style="font-size: 1.8rem;">✦ Ajibon bhalobasar shuru ekhane thekei ✦</div>
-            
-            <!-- Clickable SVG Glowing Heart Stage -->
-            <div class="heart-3d-stage" onclick="revealCoupleName()" title="Click me!">
-                <div class="heart-ring-1"></div>
-                <div class="heart-ring-2"></div>
-                <div class="heart-glow-aura"></div>
-                <div class="heart-3d-wrapper">
-                    <svg class="svg-heart-icon" viewBox="0 0 24 24" fill="url(#heroHeartGradient)" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="heroHeartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#ff0055" />
-                                <stop offset="50%" stop-color="#ff2a6d" />
-                                <stop offset="100%" stop-color="#ff758c" />
-                            </linearGradient>
-                            <filter id="heartGlow" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                                <feMerge>
-                                    <feMergeNode in="coloredBlur"/>
-                                    <feMergeNode in="SourceGraphic"/>
-                                </feMerge>
-                            </filter>
-                        </defs>
-                        <path filter="url(#heartGlow)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
+            <div class="hero-content">
+                <div class="tagline curvy-sub" style="font-size: 1.8rem;">✦ Ajibon bhalobasar shuru ekhane thekei ✦</div>
+                
+                <div class="heart-3d-stage" onclick="revealCoupleName()" title="Click me!">
+                    <div class="heart-ring-1"></div>
+                    <div class="heart-ring-2"></div>
+                    <div class="heart-glow-aura"></div>
+                    <div class="heart-3d-wrapper">
+                        <svg class="svg-heart-icon" viewBox="0 0 24 24" fill="url(#heroHeartGradient)" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="heroHeartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#ff0055" />
+                                    <stop offset="50%" stop-color="#ff2a6d" />
+                                    <stop offset="100%" stop-color="#ff758c" />
+                                </linearGradient>
+                                <filter id="heartGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <path filter="url(#heartGlow)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="couple-display" id="coupleDisplayBox">
+                    <h3 class="curvy-title" style="font-size: 2.2rem; color: #ff0055;">Sofick <span style="color:#ff2a6d;">❤️</span> Najma</h3>
+                </div>
+
+                <h1 class="curvy-title">Shubho Jonmodin</h1>
+                <h2 class="curvy-sub" style="color: var(--secondary);">Amar Priyo Prithibi ✨</h2>
+                <p class="curvy-hand" style="font-size: 1.6rem; color: #555;">
+                    Tomar sathe katano protiti muhurto jadukori. Tumi amar jibonke rongin korecho bhalobasha aar hashite. Ajker ei bishesh dine tomar jonno roilo amar hridoyer gobhir theke bhalobasha!
+                </p>
+                <button class="btn-primary curvy-hand" style="font-size: 1.5rem;" onclick="openModal()">💌 Amar Hridoy Unmukto Korun</button>
+            </div>
+        </section>
+
+        <!-- Style 1: Photo Studio Grid -->
+        <section class="section photo-section" id="studio">
+            <h2 class="section-title curvy-title">Photo Studio Grid 📸</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Amader sundor muhurto gular 3D frame...</p>
+            <div class="image-grid-1">
+                <div class="grid-card-1 anim-box"><img src="love.jpg" alt="1"></div>
+                <div class="grid-card-1 anim-box"><img src="photo4.jpg" alt="2"></div>
+                <div class="grid-card-1 anim-box"><img src="couple.jpg" alt="3"></div>
+                <div class="grid-card-1 anim-box"><img src="photo2.jpg" alt="4"></div>
+            </div>
+        </section>
+
+        <!-- Style 2: Polaroid Wall -->
+        <section class="section photo-section" id="polaroid">
+            <h2 class="section-title curvy-title">Polaroid Wall 📌</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Hanging memories wrapped in vintage frames...</p>
+            <div class="polaroid-grid-2">
+                <div class="polaroid-card-2 anim-box"><img src="najubabu.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:1.8rem; margin-top:10px;">Sweetest Smile</div></div>
+                <div class="polaroid-card-2 anim-box"><img src="photo10.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:1.8rem; margin-top:10px;">Forever Us</div></div>
+                <div class="polaroid-card-2 anim-box"><img src="photo11.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:1.8rem; margin-top:10px;">Magic Moments</div></div>
+                <div class="polaroid-card-2 anim-box"><img src="myqueen.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:1.8rem; margin-top:10px;">My Queen</div></div>
+            </div>
+        </section>
+
+        <!-- Style 3: Diamond Mosaic Gallery -->
+        <section class="section photo-section" id="mosaic">
+            <h2 class="section-title curvy-title">Diamond Mosaic ✨</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Our beautiful journey in mosaic alignment...</p>
+            <div class="mosaic-grid-3">
+                <div class="mosaic-item-3 anim-box"><img src="school.jpg" alt=""></div>
+                <div class="mosaic-item-3 anim-box"><img src="photo3.jpg" alt=""></div>
+                <div class="mosaic-item-3 anim-box"><img src="propose.jpg" alt=""></div>
+                <div class="mosaic-item-3 anim-box"><img src="park.jpg" alt=""></div>
+                <div class="mosaic-item-3 anim-box"><img src="propose2.jpg" alt=""></div>
+                <div class="mosaic-item-3 anim-box"><img src="propose3.jpg" alt=""></div>
+            </div>
+        </section>
+
+        <!-- Style 4: Circular Bubble Orbit -->
+        <section class="section photo-section" id="bubbles">
+            <h2 class="section-title curvy-title">Bubble Orbits 💫</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Floating bubbles of pure joy and love...</p>
+            <div class="bubble-grid-4">
+                <div class="bubble-card-4 anim-box"><img src="propose4.jpg" alt=""></div>
+                <div class="bubble-card-4 anim-box"><img src="photo2.jpg" alt=""></div>
+                <div class="bubble-card-4 anim-box"><img src="photo3.jpg" alt=""></div>
+                <div class="bubble-card-4 anim-box"><img src="propose8.jpg" alt=""></div>
+                <div class="bubble-card-4 anim-box"><img src="sofick.jpg" alt=""></div>
+            </div>
+        </section>
+
+        <!-- Style 5: Neon Glow Cards -->
+        <section class="section photo-section" id="neon">
+            <h2 class="section-title curvy-title">Neon Glow Studio 💖</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Bright glowing neon highlights for our love...</p>
+            <div class="neon-grid-5">
+                <div class="neon-card-5 anim-box"><img src="photo10.jpg" alt=""><div class="curvy-hand" style="color:#fff; font-size:1.3rem; margin-top:8px;">Glowing Heart 🌹</div></div>
+                <div class="neon-card-5 anim-box"><img src="propose10.jpg" alt=""><div class="curvy-hand" style="color:#fff; font-size:1.3rem; margin-top:8px;">Neon Nights ✨</div></div>
+                <div class="neon-card-5 anim-box"><img src="propose13.jpeg" alt=""><div class="curvy-hand" style="color:#fff; font-size:1.3rem; margin-top:8px;">Radiant Smile 🥰</div></div>
+            </div>
+        </section>
+
+        <!-- Style 6: Stained Glass Skewed Grid -->
+        <section class="section photo-section" id="glass">
+            <h2 class="section-title curvy-title">Stained Glass Frames 🌸</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Artistic curvy shapes capturing our best days...</p>
+            <div class="glass-grid-6">
+                <div class="glass-card-6 anim-box"><img src="propose5.jpg" alt=""></div>
+                <div class="glass-card-6 anim-box"><img src="propose14.jpg.jpg" alt=""></div>
+                <div class="glass-card-6 anim-box"><img src="propose9.jpg" alt=""></div>
+                <div class="glass-card-6 anim-box"><img src="propose12.jpg" alt=""></div>
+            </div>
+        </section>
+
+        <!-- Style 7: 3D Stack Deck -->
+        <section class="section photo-section" id="stack">
+            <h2 class="section-title curvy-title">Stacked Deck Memories 🃏</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Decks of love stacked right inside my heart...</p>
+            <div class="stack-grid-7">
+                <div class="stack-card-7 anim-box"><img src="photo1.jpg" alt=""></div>
+                <div class="stack-card-7 anim-box"><img src="photo2.jpg" alt=""></div>
+                <div class="stack-card-7 anim-box"><img src="propose6.jpg" alt=""></div>
+                <div class="stack-card-7 anim-box"><img src="propose7.jpg" alt=""></div>
+            </div>
+        </section>
+
+        <!-- Style 8: Ribbon Scroll Grid -->
+        <section class="section photo-section" id="ribbon">
+            <h2 class="section-title curvy-title">Ribbon Wrapped Frames 🎀</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Gift-wrapped memories dedicated to you...</p>
+            <div class="ribbon-grid-8">
+                <div class="ribbon-card-8 anim-box"><img src="gift1.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:2rem; margin-top:10px;">Special Gift</div></div>
+                <div class="ribbon-card-8 anim-box"><img src="photo11.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:2rem; margin-top:10px;">Precious Bond</div></div>
+            </div>
+        </section>
+
+        <!-- Style 9: Holographic Glass Cards -->
+        <section class="section photo-section" id="holo">
+            <h2 class="section-title curvy-title">Holographic Glass 🔮</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Translucent frosted glass frames...</p>
+            <div class="holo-grid-9">
+                <div class="holo-card-9 anim-box"><img src="propose11.jpg" alt=""><div class="curvy-hand" style="font-size:1.3rem; margin-top:8px; color:var(--primary);">Crystal Love</div></div>
+                <div class="holo-card-9 anim-box"><img src="dreamholo.png" alt=""><div class="curvy-hand" style="font-size:1.3rem; margin-top:8px; color:var(--primary);">Holo Dreams</div></div>
+            </div>
+        </section>
+
+        <!-- Style 10: Romantic Envelope Cards -->
+        <section class="section photo-section" id="envelope">
+            <h2 class="section-title curvy-title">Love Letters 💌</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Sealed envelopes of unending romance...</p>
+            <div class="envelope-grid-10">
+                <div class="envelope-card-10 anim-box"><img src="propose14.jpg" alt=""><div class="curvy-hand" style="font-size:1.4rem; margin-top:8px;">Dearest Najma 💕</div></div>
+                <div class="envelope-card-10 anim-box"><img src="nabadwip.jpg" alt=""><div class="curvy-hand" style="font-size:1.4rem; margin-top:8px;">Forever Yours ✨</div></div>
+            </div>
+        </section>
+
+        <!-- Continuous Seamless Scroll Gallery -->
+        <section class="section photo-section">
+            <h2 class="section-title curvy-title">Sritir Olinde</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Protiti chhobi amader golper ek ekti odhyay...</p>
+            <div class="carousel-wrapper">
+                <div class="carousel-track">
+                    <div class="gallery-card"><img src="photo5.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo1.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo10.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo11.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo2.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo3.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="nabadwip5.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo5.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo1.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo10.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo11.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo2.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo3.jpg" alt=""></div>
+                    <div class="gallery-card"><img src="photo4.jpg" alt=""></div>
                 </div>
             </div>
+        </section>
 
-            <!-- Couple Name Display Box -->
-            <div class="couple-display" id="coupleDisplayBox">
-                <h3 class="curvy-title" style="font-size: 2.2rem; color: #ff0055;">Sofick <span style="color:#ff2a6d;">❤️</span> Najma</h3>
-            </div>
-
-            <h1 class="curvy-title">Shubho Jonmodin</h1>
-            <h2 class="curvy-sub" style="color: var(--secondary);">Amar Priyo Prithibi ✨</h2>
-            <p class="curvy-hand" style="font-size: 1.6rem; color: #555;">
-                Tomar sathe katano protiti muhurto jadukori. Tumi amar jibonke rongin korecho bhalobasha aar hashite. Ajker ei bishesh dine tomar jonno roilo amar hridoyer gobhir theke bhalobasha!
-            </p>
-            <button class="btn-primary curvy-hand" style="font-size: 1.5rem;" onclick="openModal()">💌 Amar Hridoy Unmukto Korun</button>
-        </div>
-    </section>
-
-
-    <!-- ==========================================
-       10 DISTINCT IMAGE STYLES & SECTIONS (WITH ANIMATED BOXES)
-       ========================================== -->
-
-    <!-- Style 1: Photo Studio Grid -->
-    <section class="section photo-section" id="studio">
-        <h2 class="section-title curvy-title">Photo Studio Grid 📸</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Amader sundor muhurto gular 3D frame...</p>
-        <div class="image-grid-1">
-            <div class="grid-card-1 anim-box"><img src="love.jpg" alt="1"></div>
-            <div class="grid-card-1 anim-box"><img src="photo4.jpg" alt="2"></div>
-            <div class="grid-card-1 anim-box"><img src="couple.jpg" alt="3"></div>
-            <div class="grid-card-1 anim-box"><img src="photo2.jpg" alt="4"></div>
-        </div>
-    </section>
-
-    <!-- Style 2: Polaroid Wall -->
-    <section class="section photo-section" id="polaroid">
-        <h2 class="section-title curvy-title">Polaroid Wall 📌</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Hanging memories wrapped in vintage frames...</p>
-        <div class="polaroid-grid-2">
-            <div class="polaroid-card-2 anim-box"><img src="najubabu.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:1.8rem; margin-top:10px;">Sweetest Smile</div></div>
-            <div class="polaroid-card-2 anim-box"><img src="photo10.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:1.8rem; margin-top:10px;">Forever Us</div></div>
-            <div class="polaroid-card-2 anim-box"><img src="photo11.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:1.8rem; margin-top:10px;">Magic Moments</div></div>
-            <div class="polaroid-card-2 anim-box"><img src="myqueen.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:1.8rem; margin-top:10px;">My Queen</div></div>
-        </div>
-    </section>
-
-    <!-- Style 3: Diamond Mosaic Gallery -->
-    <section class="section photo-section" id="mosaic">
-        <h2 class="section-title curvy-title">Diamond Mosaic ✨</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Our beautiful journey in mosaic alignment...</p>
-        <div class="mosaic-grid-3">
-            <div class="mosaic-item-3 anim-box"><img src="school.jpg" alt=""></div>
-            <div class="mosaic-item-3 anim-box"><img src="photo3.jpg" alt=""></div>
-            <div class="mosaic-item-3 anim-box"><img src="propose.jpg" alt=""></div>
-            <div class="mosaic-item-3 anim-box"><img src="park.jpg" alt=""></div>
-            <div class="mosaic-item-3 anim-box"><img src="propose2.jpg" alt=""></div>
-            <div class="mosaic-item-3 anim-box"><img src="propose3.jpg" alt=""></div>
-        </div>
-    </section>
-
-    <!-- Style 4: Circular Bubble Orbit -->
-    <section class="section photo-section" id="bubbles">
-        <h2 class="section-title curvy-title">Bubble Orbits 💫</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Floating bubbles of pure joy and love...</p>
-        <div class="bubble-grid-4">
-            <div class="bubble-card-4 anim-box"><img src="propose4.jpg" alt=""></div>
-            <div class="bubble-card-4 anim-box"><img src="photo2.jpg" alt=""></div>
-            <div class="bubble-card-4 anim-box"><img src="photo3.jpg" alt=""></div>
-            <div class="bubble-card-4 anim-box"><img src="propose8.jpg" alt=""></div>
-            <div class="bubble-card-4 anim-box"><img src="sofick.jpg" alt=""></div>
-        </div>
-    </section>
-
-    <!-- Style 5: Neon Glow Cards -->
-    <section class="section photo-section" id="neon">
-        <h2 class="section-title curvy-title">Neon Glow Studio 💖</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Bright glowing neon highlights for our love...</p>
-        <div class="neon-grid-5">
-            <div class="neon-card-5 anim-box"><img src="photo10.jpg" alt=""><div class="curvy-hand" style="color:#fff; font-size:1.3rem; margin-top:8px;">Glowing Heart 🌹</div></div>
-            <div class="neon-card-5 anim-box"><img src="propose10.jpg" alt=""><div class="curvy-hand" style="color:#fff; font-size:1.3rem; margin-top:8px;">Neon Nights ✨</div></div>
-            <div class="neon-card-5 anim-box"><img src="propose13.jpeg" alt=""><div class="curvy-hand" style="color:#fff; font-size:1.3rem; margin-top:8px;">Radiant Smile 🥰</div></div>
-        </div>
-    </section>
-
-    <!-- Style 6: Stained Glass Skewed Grid -->
-    <section class="section photo-section" id="glass">
-        <h2 class="section-title curvy-title">Stained Glass Frames 🌸</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Artistic curvy shapes capturing our best days...</p>
-        <div class="glass-grid-6">
-            <div class="glass-card-6 anim-box"><img src="propose5.jpg" alt=""></div>
-            <div class="glass-card-6 anim-box"><img src="propose14.jpg.jpg" alt=""></div>
-            <div class="glass-card-6 anim-box"><img src="propose9.jpg" alt=""></div>
-            <div class="glass-card-6 anim-box"><img src="propose12.jpg" alt=""></div>
-        </div>
-    </section>
-
-    <!-- Style 7: 3D Stack Deck -->
-    <section class="section photo-section" id="stack">
-        <h2 class="section-title curvy-title">Stacked Deck Memories 🃏</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Decks of love stacked right inside my heart...</p>
-        <div class="stack-grid-7">
-            <div class="stack-card-7 anim-box"><img src="photo1.jpg" alt=""></div>
-            <div class="stack-card-7 anim-box"><img src="photo2.jpg" alt=""></div>
-            <div class="stack-card-7 anim-box"><img src="propose6.jpg" alt=""></div>
-            <div class="stack-card-7 anim-box"><img src="propose7.jpg" alt=""></div>
-        </div>
-    </section>
-
-    <!-- Style 8: Ribbon Scroll Grid -->
-    <section class="section photo-section" id="ribbon">
-        <h2 class="section-title curvy-title">Ribbon Wrapped Frames 🎀</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Gift-wrapped memories dedicated to you...</p>
-        <div class="ribbon-grid-8">
-            <div class="ribbon-card-8 anim-box"><img src="gift1.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:2rem; margin-top:10px;">Special Gift</div></div>
-            <div class="ribbon-card-8 anim-box"><img src="photo11.jpg" alt=""><div class="curvy-title" style="color:var(--primary); font-size:2rem; margin-top:10px;">Precious Bond</div></div>
-        </div>
-    </section>
-
-    <!-- Style 9: Holographic Glass Cards -->
-    <section class="section photo-section" id="holo">
-        <h2 class="section-title curvy-title">Holographic Glass 🔮</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Translucent frosted glass frames...</p>
-        <div class="holo-grid-9">
-            <div class="holo-card-9 anim-box"><img src="propose11.jpg" alt=""><div class="curvy-hand" style="font-size:1.3rem; margin-top:8px; color:var(--primary);">Crystal Love</div></div>
-            <div class="holo-card-9 anim-box"><img src="dreamholo.png" alt=""><div class="curvy-hand" style="font-size:1.3rem; margin-top:8px; color:var(--primary);">Holo Dreams</div></div>
-        </div>
-    </section>
-
-    <!-- Style 10: Romantic Envelope Cards -->
-    <section class="section photo-section" id="envelope">
-        <h2 class="section-title curvy-title">Love Letters 💌</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Sealed envelopes of unending romance...</p>
-        <div class="envelope-grid-10">
-            <div class="envelope-card-10 anim-box"><img src="propose14.jpg" alt=""><div class="curvy-hand" style="font-size:1.4rem; margin-top:8px;">Dearest Najma 💕</div></div>
-            <div class="envelope-card-10 anim-box"><img src="nabadwip.jpg" alt=""><div class="curvy-hand" style="font-size:1.4rem; margin-top:8px;">Forever Yours ✨</div></div>
-        </div>
-    </section>
-
-
-    <!-- Continuous Seamless Scroll Gallery -->
-    <section class="section photo-section">
-        <h2 class="section-title curvy-title">Sritir Olinde</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Protiti chhobi amader golper ek ekti odhyay...</p>
-        <div class="carousel-wrapper">
-            <div class="carousel-track">
-                <div class="gallery-card"><img src="photo5.jpg" alt=""></div>
-                <div class="gallery-card"><img src="photo1.jpg" alt=""></div>
-                <div class="gallery-card"><img src="photo10.jpg" alt=""></div>
-                <div class="gallery-card"><img src="photo11.jpg" alt=""></div>
-                <div class="gallery-card"><img src="photo2.jpg" alt=""></div>
-                <div class="gallery-card"><img src="photo3.jpg" alt=""></div>
-                <div class="gallery-card"><img src="nabadwip5.jpg" alt=""></div>
-                <!-- Loop Duplicate -->
-                <div class="gallery-card"><img src="photo5.jpg" alt=""></div>
-                <div class="gallery-card"><img src="photo1.jpg" alt=""></div>
-                <div class="gallery-card"><img src="photo10.jpg" alt=""></div>
-                <div class="gallery-card"><img src="photo11.jpg" alt=""></div>
-                <div class="gallery-card"><img src="photo2.jpg" alt=""></div>
-                <div class="gallery-card"><img src="photo3.jpg" alt=""></div>
-                <div class="gallery-card"><img src="photo4.jpg" alt=""></div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ==========================================
-       3 STYLED VIDEO SECTIONS
-       ========================================== -->
-    <section class="section video-section" id="videos">
-        <h2 class="section-title curvy-title">Cinematic Video Deck 🎬</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Amader eksathe katano anandoghono somoyer video gulo...</p>
-        
-        <!-- Video Style 1 -->
-        <div style="margin-bottom: 40px;" class="anim-box">
-            <h3 class="curvy-sub" style="font-size: 2rem; color: var(--primary); margin-bottom: 15px;">Cinematic Frame</h3>
-            <div class="video-container-1">
-                <video controls poster="nabadwip2.jpg">
-                    <source src="LV.mp4" type="video/mp4">
-                </video>
-            </div>
-        </div>
-
-        <!-- Video Style 2: Retro TV Frame -->
-        <div style="margin-bottom: 40px;" class="anim-box">
-            <h3 class="curvy-sub" style="font-size: 2rem; color: var(--primary); margin-bottom: 15px;">Vintage Retro TV</h3>
-            <div class="tv-container-2">
-                <div class="tv-screen">
-                    <video controls poster="sofick.jpg">
-                        <source src="video2.mp4" type="video/mp4">
+        <!-- VIDEO SECTIONS -->
+        <section class="section video-section" id="videos">
+            <h2 class="section-title curvy-title">Cinematic Video Deck 🎬</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">Amader eksathe katano anandoghono somoyer video gulo...</p>
+            
+            <div style="margin-bottom: 40px;" class="anim-box">
+                <h3 class="curvy-sub" style="font-size: 2rem; color: var(--primary); margin-bottom: 15px;">Cinematic Frame</h3>
+                <div class="video-container-1">
+                    <video controls poster="nabadwip2.jpg">
+                        <source src="LV.mp4" type="video/mp4">
                     </video>
                 </div>
             </div>
-        </div>
 
-        <!-- Video Style 3: Holographic Neon Deck -->
-        <div class="anim-box">
-            <h3 class="curvy-sub" style="font-size: 2rem; color: var(--primary); margin-bottom: 15px;">Neon Hologram Deck</h3>
-            <div class="neon-video-3">
-                <div class="neon-video-screen">
-                    <video controls poster="video3photo.jpg">
-                        <source src="video3.mp4" type="video/mp4">
-                    </video>
+            <div style="margin-bottom: 40px;" class="anim-box">
+                <h3 class="curvy-sub" style="font-size: 2rem; color: var(--primary); margin-bottom: 15px;">Vintage Retro TV</h3>
+                <div class="tv-container-2">
+                    <div class="tv-screen">
+                        <video controls poster="sofick.jpg">
+                            <source src="video2.mp4" type="video/mp4">
+                        </video>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-
-    <!-- OUR UNIVERSE ORBIT SECTION -->
-    <section class="section" id="orbit">
-        <h2 class="section-title curvy-title">The Center of My World</h2>
-        <p class="section-subtitle curvy-sub" style="font-size: 1.8rem;">SOFICK & NAJMA FOREVER ❤️</p>
-
-        <div class="orbit-container">
-            <img src="photo5.jpg" class="floating-avatar img-float-1 anim-box" alt="">
-            <img src="photo2.jpg" class="floating-avatar img-float-2 anim-box" alt="">
-            <img src="najubabu.jpg" class="floating-avatar img-center anim-box" alt="">
-            <img src="photo4.jpg" class="floating-avatar img-float-3 anim-box" alt="">
-            <img src="photo10.jpg" class="floating-avatar img-float-4 anim-box" alt="">
-        </div>
-    </section>
-
-    <!-- LOVE STATS SECTION -->
-    <section class="section">
-        <h2 class="section-title curvy-title">The Measure of Love</h2>
-        <div class="stats-grid">
-            <div class="stat-card anim-box">
-                <div class="stat-number">365+</div>
-                <div class="stat-label curvy-hand" style="font-size: 1.4rem;">Jadukori Din</div>
+            <div class="anim-box">
+                <h3 class="curvy-sub" style="font-size: 2rem; color: var(--primary); margin-bottom: 15px;">Neon Hologram Deck</h3>
+                <div class="neon-video-3">
+                    <div class="neon-video-screen">
+                        <video controls poster="video3photo.jpg">
+                            <source src="video3.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card anim-box">
-                <div class="stat-number">1000+</div>
-                <div class="stat-label curvy-hand" style="font-size: 1.4rem;">Hashir Karon</div>
-            </div>
-            <div class="stat-card anim-box">
-                <div class="stat-number">∞</div>
-                <div class="stat-label curvy-hand" style="font-size: 1.4rem;">Chirokal O Sorboda</div>
-            </div>
-            <div class="stat-card anim-box">
-                <div class="stat-number">1</div>
-                <div class="stat-label curvy-hand" style="font-size: 1.4rem;">Najma, Shudhui Tumi</div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- DIRECT CALL & WHATSAPP SECTION -->
-    <section class="section" id="contact">
-        <div class="contact-section anim-box">
-            <h2 class="section-title curvy-title" style="font-size: 3.5rem;">Let's Talk, My Love 📞</h2>
-            <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">One click away to connect directly with Sofick & Najma!</p>
-            
-            <div class="contact-buttons">
-                <a href="tel:7029694606" class="contact-btn call-btn curvy-hand" style="font-size: 1.4rem;">
-                    📞 Call Now (7029694606)
-                </a>
-                <a href="https://wa.me/917029694606?text=Hi%20my%20love,%20Happy%20Birthday!%20❤️" target="_blank" class="contact-btn wa-btn curvy-hand" style="font-size: 1.4rem;">
-                    💬 WhatsApp Chat
-                </a>
-            </div>
-        </div>
-    </section>
+        <!-- OUR UNIVERSE ORBIT SECTION -->
+        <section class="section" id="orbit">
+            <h2 class="section-title curvy-title">The Center of My World</h2>
+            <p class="section-subtitle curvy-sub" style="font-size: 1.8rem;">SOFICK & NAJMA FOREVER ❤️</p>
 
-    <!-- SECRET POPUP MODAL -->
-    <section class="modal" id="secretModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h3 class="curvy-title" style="color: var(--primary); margin-bottom: 15px; font-size: 3rem;">Ekti Gopon Barta... 💌</h3>
-            <p class="curvy-hand" style="color: #444; line-height: 1.8; font-size: 1.6rem;">
-                Prio Naju,<br><br>
-                Tomar hashir moto sundor ar kichu nei. Tumi amar jiboner shei ashirbaad, ja ami protidin chai. Sarajibon ebhabe bhese thakuk amader sundor muhurto gulo! <br><br>
-                <strong style="color: var(--primary);">Shubho Jonmodin, Amar Bhalobasha! 💕</strong>
-            </p>
-        </div>
-    </section>
+            <div class="orbit-container">
+                <img src="photo5.jpg" class="floating-avatar img-float-1 anim-box" alt="">
+                <img src="photo2.jpg" class="floating-avatar img-float-2 anim-box" alt="">
+                <img src="najubabu.jpg" class="floating-avatar img-center anim-box" alt="">
+                <img src="photo4.jpg" class="floating-avatar img-float-3 anim-box" alt="">
+                <img src="photo10.jpg" class="floating-avatar img-float-4 anim-box" alt="">
+            </div>
+        </section>
+
+        <!-- LOVE STATS SECTION -->
+        <section class="section">
+            <h2 class="section-title curvy-title">The Measure of Love</h2>
+            <div class="stats-grid">
+                <div class="stat-card anim-box">
+                    <div class="stat-number">365+</div>
+                    <div class="stat-label curvy-hand" style="font-size: 1.4rem;">Jadukori Din</div>
+                </div>
+                <div class="stat-card anim-box">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label curvy-hand" style="font-size: 1.4rem;">Hashir Karon</div>
+                </div>
+                <div class="stat-card anim-box">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label curvy-hand" style="font-size: 1.4rem;">Chirokal O Sorboda</div>
+                </div>
+                <div class="stat-card anim-box">
+                    <div class="stat-number">1</div>
+                    <div class="stat-label curvy-hand" style="font-size: 1.4rem;">Najma, Shudhui Tumi</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIRECT CALL & WHATSAPP SECTION -->
+        <section class="section" id="contact">
+            <div class="contact-section anim-box">
+                <h2 class="section-title curvy-title" style="font-size: 3.5rem;">Let's Talk, My Love 📞</h2>
+                <p class="section-subtitle curvy-sub" style="font-size: 1.6rem;">One click away to connect directly with Sofick & Najma!</p>
+                
+                <div class="contact-buttons">
+                    <a href="tel:7029694606" class="contact-btn call-btn curvy-hand" style="font-size: 1.4rem;">
+                        📞 Call Now (7029694606)
+                    </a>
+                    <a href="https://wa.me/917029694606?text=Hi%20my%20love,%20Happy%20Birthday!%20❤️" target="_blank" class="contact-btn wa-btn curvy-hand" style="font-size: 1.4rem;">
+                        💬 WhatsApp Chat
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECRET POPUP MODAL -->
+        <section class="modal" id="secretModal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <h3 class="curvy-title" style="color: var(--primary); margin-bottom: 15px; font-size: 3rem;">Ekti Gopon Barta... 💌</h3>
+                <p class="curvy-hand" style="color: #444; line-height: 1.8; font-size: 1.6rem;">
+                    Prio Naju,<br><br>
+                    Tomar hashir moto sundor ar kichu nei. Tumi amar jiboner shei ashirbaad, ja ami protidin chai. Sarajibon ebhabe bhese thakuk amader sundor muhurto gulo! <br><br>
+                    <strong style="color: var(--primary);">Shubho Jonmodin, Amar Bhalobasha! 💕</strong>
+                </p>
+            </div>
+        </section>
+    </div>
 
     <script>
-        // --- VIEW SWITCHER LOGIC ---
+        // State Machine to prevent premature scroll or visibility
+        let isCountdownPassed = false;
+        let isPasswordPassed = false;
+
+        const TARGET_DATE = new Date("2026-08-15T00:00:00+05:30").getTime();
+
+        function checkUnlock() {
+            if (isCountdownPassed && isPasswordPassed) {
+                const overlay = document.getElementById('countdownOverlay');
+                const unlockScreen = document.getElementById('passwordUnlockScreen');
+                const pageContent = document.getElementById('pageContent');
+
+                if (overlay) overlay.style.display = 'none';
+                if (unlockScreen) unlockScreen.style.display = 'none';
+
+                if (pageContent) {
+                    pageContent.classList.remove('content-hidden');
+                }
+
+                document.body.classList.remove('locked');
+
+                // Trigger confetti & music
+                // @ts-ignore
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 150, spread: 100, origin: { y: 0.5 },
+                        colors: ['#ff0055', '#ff2a6d', '#ffffff'], zIndex: 10005
+                    });
+                }
+
+                const music = /** @type {HTMLAudioElement} */ (document.getElementById('bgMusic'));
+                const musicBtn = document.getElementById('musicBtn');
+                if (music && music.paused) {
+                    music.play().catch(() => console.log("Audio play prevented"));
+                    if (musicBtn) musicBtn.innerText = '⏸️';
+                }
+            }
+        }
+
+        function updateCountdown() {
+            const overlay = document.getElementById('countdownOverlay');
+            const cdHours = document.getElementById('cdHours');
+            const cdMinutes = document.getElementById('cdMinutes');
+            const cdSeconds = document.getElementById('cdSeconds');
+            const cdMs = document.getElementById('cdMs');
+
+            const now = new Date().getTime();
+            const distance = TARGET_DATE - now;
+
+            if (distance <= 0) {
+                isCountdownPassed = true;
+                if (overlay) overlay.style.opacity = '0';
+                setTimeout(() => {
+                    if (overlay) overlay.style.display = 'none';
+                }, 600);
+                checkUnlock();
+                return;
+            }
+
+            const hours = Math.floor(distance / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            const ms = Math.floor((distance % 1000) / 10);
+
+            if (cdHours) cdHours.innerText = String(hours).padStart(2, '0');
+            if (cdMinutes) cdMinutes.innerText = String(minutes).padStart(2, '0');
+            if (cdSeconds) cdSeconds.innerText = String(seconds).padStart(2, '0');
+            if (cdMs) cdMs.innerText = String(ms).padStart(2, '0');
+
+            requestAnimationFrame(updateCountdown);
+        }
+
+        // PASSWORD CHECK LOGIC
+        function checkPassword() {
+            const inputField = /** @type {HTMLInputElement} */ (document.getElementById('secretInput'));
+            const inputPass = inputField ? inputField.value : '';
+            const errorMsg = document.getElementById('errorMsg');
+            const unlockScreen = document.getElementById('passwordUnlockScreen');
+            const correctPassword = "sofickMYLOVE"; 
+
+            if (inputPass === correctPassword) {
+                if (errorMsg) errorMsg.style.display = 'none';
+                isPasswordPassed = true;
+                if (unlockScreen) unlockScreen.style.opacity = '0';
+
+                setTimeout(() => {
+                    if (unlockScreen) unlockScreen.style.display = 'none';
+                    checkUnlock();
+                }, 500);
+            } else {
+                if (errorMsg) errorMsg.style.display = 'block';
+                if (inputField) {
+                    inputField.style.transform = 'translateX(-10px)';
+                    setTimeout(() => inputField.style.transform = 'translateX(10px)', 100);
+                    setTimeout(() => inputField.style.transform = 'translateX(-10px)', 200);
+                    setTimeout(() => inputField.style.transform = 'translateX(0)', 300);
+                }
+            }
+        }
+
+        // VIEW SWITCHER LOGIC
         /**
          * @param {HTMLElement} btnElement
          * @param {string} type
@@ -1033,9 +1231,7 @@
             const buttons = document.querySelectorAll('.view-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             
-            if (btnElement) {
-                btnElement.classList.add('active');
-            }
+            if (btnElement) btnElement.classList.add('active');
 
             const photoSections = document.querySelectorAll('.photo-section');
             const videoSections = document.querySelectorAll('.video-section');
@@ -1052,8 +1248,10 @@
             }
         }
 
-        // --- SCROLL INTERSECTION OBSERVER FOR IMAGE BOX ANIMATIONS ---
+        // SCROLL OBSERVER
         document.addEventListener("DOMContentLoaded", function() {
+            updateCountdown();
+
             const observerOptions = {
                 root: null,
                 rootMargin: '0px',
@@ -1073,7 +1271,7 @@
             });
         });
 
-        // --- INTERACTIVE HEART CLICK REVEAL ---
+        // HEART CLICK REVEAL
         function revealCoupleName() {
             const displayBox = document.getElementById('coupleDisplayBox');
             if (displayBox) displayBox.style.display = 'block';
@@ -1088,7 +1286,7 @@
             });
         }
 
-        // --- 3D PARTICLE ENGINE ---
+        // 3D PARTICLE ENGINE
         const particleContainer = document.getElementById('particle-container');
         const roses = ['🌹', '🌸', '💮', '💖'];
         const birds = ['🕊️', '✨', '🦋'];
@@ -1122,7 +1320,7 @@
             setTimeout(() => create3DParticle('rose'), i * 250);
         }
 
-        // --- SPARKLE CURSOR ---
+        // SPARKLE CURSOR
         /**
          * @param {number} x
          * @param {number} y
@@ -1147,7 +1345,7 @@
             }
         });
 
-        // --- MODAL CONTROL ---
+        // MODAL CONTROL
         function openModal() {
             const modal = document.getElementById('secretModal');
             if (modal) {
@@ -1186,11 +1384,10 @@
             if (event.target === modal && modal) modal.style.display = "none";
         }
 
-        // --- AUDIO MUSIC CONTROL ---
-        const music = /** @type {HTMLAudioElement} */ (document.getElementById('bgMusic'));
-        const musicBtn = document.getElementById('musicBtn');
-        
+        // AUDIO MUSIC CONTROL
         function toggleMusic() {
+            const music = /** @type {HTMLAudioElement} */ (document.getElementById('bgMusic'));
+            const musicBtn = document.getElementById('musicBtn');
             if (!music || !musicBtn) return;
             if (music.paused) {
                 music.play();
@@ -1198,41 +1395,6 @@
             } else {
                 music.pause();
                 musicBtn.innerText = '🎵';
-            }
-        }
-
-        // --- PASSWORD LOGIN UNLOCK & VIEW OPTIONS ---
-        function checkPassword() {
-            const inputField = /** @type {HTMLInputElement} */ (document.getElementById('secretInput'));
-            const inputPass = inputField ? inputField.value : '';
-            const errorMsg = document.getElementById('errorMsg');
-            const unlockScreen = document.getElementById('passwordUnlockScreen');
-            const correctPassword = "SofickMyLove"; 
-
-            if (inputPass === correctPassword && unlockScreen) {
-                if (errorMsg) errorMsg.style.display = 'none';
-                unlockScreen.style.opacity = '0';
-                
-                setTimeout(() => {
-                    unlockScreen.style.display = 'none';
-                    // @ts-ignore
-                    confetti({
-                        particleCount: 150, spread: 100, origin: { y: 0.5 },
-                        colors: ['#ff0055', '#ff2a6d', '#ffffff'], zIndex: 10005
-                    });
-                    if(music && music.paused) {
-                        music.play().catch(() => console.log("Audio autoplay prevented"));
-                        if (musicBtn) musicBtn.innerText = '⏸️';
-                    }
-                }, 500);
-            } else {
-                if (errorMsg) errorMsg.style.display = 'block';
-                if (inputField) {
-                    inputField.style.transform = 'translateX(-10px)';
-                    setTimeout(() => inputField.style.transform = 'translateX(10px)', 100);
-                    setTimeout(() => inputField.style.transform = 'translateX(-10px)', 200);
-                    setTimeout(() => inputField.style.transform = 'translateX(0)', 300);
-                }
             }
         }
     </script>
